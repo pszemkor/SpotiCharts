@@ -123,7 +123,7 @@ venv.bak/
 # mkdocs documentation
 /site
 
-# mypy
+# mypyw
 .mypy_cache/
 .dmypy.json
 dmypy.json
@@ -139,3 +139,5 @@ cython_debug/
 
 
 *.csv
+*.png
+*.db
