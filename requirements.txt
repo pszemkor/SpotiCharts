@@ -1,3 +1,4 @@
 fycharts==4.0.2
 numpy==1.20.1
 pandas==1.2.3
+python-dotenv==0.15.0
