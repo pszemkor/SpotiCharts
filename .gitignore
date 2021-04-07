@@ -141,3 +141,5 @@ cython_debug/
 *.csv
 *.png
 *.db
+
+/.idea
