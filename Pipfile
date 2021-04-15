@@ -10,6 +10,9 @@ pandas = "*"
 python-dotenv = "*"
 sqlalchemy = "*"
 jupyter = "*"
+ipykernel = "*"
+matplotlib = "*"
+plotly = "*"
 
 [dev-packages]
 
