@@ -12,8 +12,7 @@ sqlalchemy = "*"
 ipykernel = "*"
 matplotlib = "*"
 plotly = "*"
-scipy = "*"
-nbformat = "*"
+spotipy = "*"
 
 [dev-packages]
 

@@ -1,6 +1,6 @@
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('sqlite:///spoticharts.db', echo=True)
+engine = create_engine('sqlite:///modules/db/spoticharts.db', echo=False)
 conn = engine.connect()
-session = Session(bind=engine)
+Session = sessionmaker(bind=engine)
