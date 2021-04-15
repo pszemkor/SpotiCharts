@@ -4,7 +4,8 @@ import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from db import Top200, Viral50, AudioFeatures
+
+from modules.db.model import Viral50, Top200, AudioFeatures
 
 
 def chunks(lst, n):

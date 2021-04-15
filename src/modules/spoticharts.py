@@ -1,7 +1,8 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from modules.db import AudioFeatures, Viral50, Top200
 import pandas as pd
+
+from modules.db.model import Viral50, Top200, AudioFeatures
 
 
 class SpotiCharts:
