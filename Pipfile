@@ -12,6 +12,8 @@ sqlalchemy = "*"
 ipykernel = "*"
 matplotlib = "*"
 plotly = "*"
+scipy = "*"
+nbformat = "*"
 
 [dev-packages]
 
