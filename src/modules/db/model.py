@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey
+from sqlalchemy import Column, Integer, String, Float, Date, ForeignKey, Index
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
+
 
 class Top200(Base):
     __tablename__ = 'Top200'
@@ -13,6 +14,7 @@ class Top200(Base):
     track_name = Column(String)
     artist = Column(String)
     streams = Column(Integer)
+    __table_args__ = (Index('id', "region", "date"),)
 
 
 class Viral50(Base):
@@ -24,6 +26,7 @@ class Viral50(Base):
     position = Column(Integer)
     track_name = Column(String)
     artist = Column(String)
+    __table_args__ = (Index('id', "region", "date"),)
 
 
 class AudioFeatures(Base):
