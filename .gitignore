@@ -143,3 +143,5 @@ p-
 *.db
 
 /.idea
+
+.DS_Store

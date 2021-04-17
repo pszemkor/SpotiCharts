@@ -1,5 +1,9 @@
 ####### METRICS
 
+from modules.const import DEMOGRAPHICS
+from collections import defaultdict
+import statistics
+
 def total_streams(region, artist_all, requested_dates):
     date_streams = {}
     date_songs = {}
