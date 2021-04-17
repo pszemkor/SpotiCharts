@@ -1,9 +1,7 @@
-import numpy as np
 import pandas as pd
 import plotly.graph_objects as go
 import plotly
-from plotly.graph_objs import *
-from plotly.offline import download_plotlyjs, init_notebook_mode, plot, iplot
+from plotly.offline import plot
 from iso3166 import countries
 
 from modules.const import apply_producer, apply_producer_with_audio_features, COUNTRY_CODES
@@ -99,7 +97,7 @@ def plot_multiple_geo(data, title):
             z=df_day['value'].astype(float),
             zmin=zmin,
             zmax=zmax,
-            colorscale='Hot',
+            colorscale='greens',
         )
         data_slider.append(data_one_day)
 
