@@ -12,7 +12,7 @@ class SpotiCharts:
         self.audioDao = AudioFeaturesDao(session)
 
     def get_all_viral(self, country_codes=None, start_date=None, end_date=None, include_audio_features=True):
-        res = self.top200Dao.get_all(country_codes, start_date, end_date)
+        res = self.viral50Dao.get_all(country_codes, start_date, end_date)
         return self.__map_db_query_result(res, include_audio_features)
 
     def get_all_top_200(self, country_codes=None, start_date=None, end_date=None, include_audio_features=True):
