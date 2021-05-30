@@ -16,3 +16,10 @@ setup:
 installing new packages:
 
 ```pipenv install <package_name>```
+
+
+## Results
+https://colab.research.google.com/drive/1Hh9HQBQE5hnpHRKY9dJVE6yLLXzKwe1f?usp=sharing
+
+## Slides
+https://docs.google.com/presentation/d/1ezQ05LKxKTn8mmaKAs2bQYkwpmTzUOIWv_q68685aT0/edit?usp=sharing
