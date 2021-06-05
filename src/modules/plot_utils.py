@@ -1,5 +1,6 @@
 import pandas as pd
 import plotly.graph_objects as go
+import numpy as np
 import plotly
 from plotly.offline import plot
 from iso3166 import countries
@@ -14,16 +15,46 @@ def plot_multiple_bar(data, title, with_labels=True):
     fig.show()
 
 
+def plot_multiple_scatter(data, title, with_labels=True):
+    fig = scatter_multiple_sources(go.Figure(), data, with_labels)
+    fig = add_timeline(fig, title)
+    fig.show()
+
+
 def add_multiple_sources(fig, data, with_labels=True):
     for name, values in data:
         if with_labels:
-            x, y, labels = values
+            x = values['date']
+            y = values['val']
+            labels = values['label']
             fig.add_trace(
                 go.Bar(x=x,
                        y=y,
                        name=name.value,
                        text=labels,
                        hoverinfo='text'))
+        else:
+            x, y = values
+            fig.add_trace(
+                go.Bar(x=x,
+                       y=y,
+                       name=name.value))
+
+    return fig
+
+
+def scatter_multiple_sources(fig, data, with_labels=True):
+    for name, values in data:
+        if with_labels:
+            x = values['date']
+            y = values['val']
+            labels = values['label']
+            fig.add_trace(
+                go.Scatter(x=x,
+                           y=y,
+                           name=name.value,
+                           text=labels,
+                           hoverinfo='text'))
         else:
             x, y = values
             fig.add_trace(
@@ -75,8 +106,8 @@ def plot_multiple_geo(data, title):
     df = pd.DataFrame()
 
     for region, stats in data:
-        date = stats[0]
-        value = stats[1]
+        date = stats['date']
+        value = stats['val']
         d = {'date': date, 'value': value}
         df_country = pd.DataFrame(d)
         df_country['country_code'] = countries.get(COUNTRY_CODES[region])[2]
@@ -122,23 +153,38 @@ def plot_multiple_geo(data, title):
 
 ###### plots per artists
 
-def plot(start_date, end_date, artist_name, regions, metric, title, chart, plot_callback):
+def plot(start_date, end_date, artist_name, regions, metric, title, chart, plot_callback, interpolate=False, gradient=False, second=False):
     dates_range = pd.date_range(start_date, end_date, freq='d')
     requested_dates = list(dates_range.date)
     data = []  # (country, (dates, values))
     for region in regions:
         df = apply_producer(chart, region)
-
         artist_all = df[(df['artist'] == artist_name)]
         values, labels = metric(region, artist_all, requested_dates)
-        data.append((region, (requested_dates, values, labels)))
+        df = pd.DataFrame(columns=['date', 'val', 'label'])
+        df['date'] = dates_range
+        df['val'] = values
+        df['label'] = labels
+        if interpolate or gradient or second:
+            df = df.astype({'val': 'float'})
+            df = df.interpolate(method='linear', axis=0, limit=5)
+            df = df.fillna(0)
+            df = df.interpolate(method='linear', axis=0)
+        if gradient or second:
+            df['val'] = np.gradient(df['val'].values)
+        if second:
+            df['val'] = np.gradient(df['val'].values)
+        data.append((region, df))
     plot_callback(data, title)
 
 
-def plot_total_streams(chart, start_date, end_date, artist_name, regions):
+def plot_total_streams(chart, start_date, end_date, artist_name, regions, interpolate=False):
     title = '[{}] Total number of streams for: "{}" from: {} to: {}'.format(chart['name'], artist_name, start_date, end_date)
-    plot(start_date, end_date, artist_name, regions, total_streams, title, chart, plot_multiple_bar)
+    plot(start_date, end_date, artist_name, regions, total_streams, title, chart, plot_multiple_bar, interpolate)
 
+def scatter_total_streams(chart, start_date, end_date, artist_name, regions, interpolate=False,  gradient=False, second=False):
+    title = '[{}] Total number of streams for: "{}" from: {} to: {}'.format(chart['name'], artist_name, start_date, end_date)
+    plot(start_date, end_date, artist_name, regions, total_streams, title, chart, plot_multiple_scatter, interpolate, gradient, second)
 
 def plot_number_of_songs(chart, start_date, end_date, artist_name, regions):
     title = '[{}] Number of songs: "{}" from: {} to: {}'.format(chart['name'], artist_name, start_date, end_date)
@@ -170,7 +216,11 @@ def plot_songs_with_keyword(start_date, end_date, keyword, regions, metric, titl
         df = apply_producer(chart, region)
         songs_all = df[df['track_name'].str.contains(keyword, na=False)]
         values, labels = metric(region, songs_all, requested_dates)
-        data.append((region, (requested_dates, values, labels)))
+        df = pd.DataFrame(columns=['date', 'val', 'label'])
+        df['date'] = dates_range
+        df['val'] = values
+        df['label'] = labels
+        data.append((region, df))
     plot_callback(data, title)
 
 
@@ -212,17 +262,32 @@ def plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, 
     for region in regions:
         df = apply_producer_with_audio_features(chart, region)
         values, labels = metric(region, df, requested_dates, audio_feature)
-        data.append((region, (requested_dates, values, labels)))
+        df = pd.DataFrame(columns=['date', 'val', 'label'])
+        df['date'] = dates_range
+        df['val'] = values
+        df['label'] = labels
+        data.append((region, df))
     plot_callback(data, title)
 
 
 def plot_average_value_of_audio_feature(chart, start_date, end_date, audio_feature, regions):
-    title = '[{}] Average value of metric: {} from: {} to: {}'.format(chart['name'], audio_feature, start_date, end_date)
-    plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, average_metric, title, chart, plot_multiple_bar)
+    title = '[{}] Average value of metric: {} from: {} to: {}'.format(chart['name'], audio_feature, start_date,
+                                                                      end_date)
+    plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, average_metric, title, chart,
+                                  plot_multiple_bar)
+
+def scatter_average_value_of_audio_feature(chart, start_date, end_date, audio_feature, regions):
+    title = '[{}] Average value of metric: {} from: {} to: {}'.format(chart['name'], audio_feature, start_date,
+                                                                      end_date)
+    plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, average_metric, title, chart,
+                                  plot_multiple_scatter)
 
 def plot_average_value_of_audio_feature_geo(chart, start_date, end_date, audio_feature, regions):
-    title = '[{}] Average value of metric: {} from: {} to: {}'.format(chart['name'], audio_feature, start_date, end_date)
-    plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, average_metric, title, chart, plot_multiple_geo)
+    title = '[{}] Average value of metric: {} from: {} to: {}'.format(chart['name'], audio_feature, start_date,
+                                                                      end_date)
+    plot_songs_with_audio_feature(start_date, end_date, audio_feature, regions, average_metric, title, chart,
+                                  plot_multiple_geo)
+
 
 ### plot similarity
 

@@ -12,7 +12,7 @@ def total_streams(region, artist_all, requested_dates):
             date_streams[vals[0]] += vals[1]
             date_songs[vals[0]] = date_songs.get(vals[0], '')
             date_songs[vals[0]] += '<br>' + vals[2]
-    return ([date_streams.get(date, 0) / DEMOGRAPHICS[region] for date in requested_dates],
+    return ([date_streams.get(date, None) for date in requested_dates],
             [date_songs.get(date, '') for date in requested_dates])
 
 def number_of_songs(_region, artist_all, requested_dates):
